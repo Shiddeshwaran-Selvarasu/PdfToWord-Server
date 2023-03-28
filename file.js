@@ -1,21 +1,26 @@
-const {spawn} = require('child_process');
-const express = require('express')
-const path = require('path')
-const fs = require('fs')
-const multer = require('multer');
-var upload = multer({dest: './'})
+const { spawn } = require('child_process');  // spawn a child process to run the [./app.py] python script
+const express = require('express'); // express framework for api request handling
+const fs = require('fs'); // file system module for reading and writing files
 
-var app = express()
+const path = require('path'); // path module for file path handling
+const multer = require('multer');  // multer module for handling file uploads
+const { Console } = require('console');
+var upload = multer({ dest: './uploads/' }) // multer current working directory configuration
+
+var app = express();
+
+const loger = fs.createWriteStream('./log.txt', { flags: 'a' }); // write stream (in append mode) for logging
 
 app.post('/upload', upload.single("pdf"), function (req, res) {
 
-  console.log("Received file" + req.file.originalname);
+  loger.write(`[${new Date()}]: Received file - ` + req.file.originalname + "\n");
   var statusMap = {};
 
   var src = fs.createReadStream(req.file.path);
-  var dest = fs.createWriteStream('./' + req.file.originalname);
+  var dest = fs.createWriteStream('./uploads/' + req.file.originalname);
 
   src.pipe(dest);
+
   src.on('end', function () {
     fs.unlinkSync(req.file.path);
     statusMap['uploaded'] = true;
@@ -23,46 +28,50 @@ app.post('/upload', upload.single("pdf"), function (req, res) {
 
   src.on('error', function (err) {
     statusMap['uploaded'] = false;
+    res.send(statusMap);
+    res.end();
   });
 
-  const python = spawn('python', ['./app.py', path.join(process.cwd(), req.file.originalname)]);
+  console.log(process.cwd());
 
-  python.stdout.on('data', function (data) {
-    console.log(JSON.parse(data));
+  const converter = spawn('python', ['./app.py', path.join(process.cwd() + "\\uploads\\", req.file.originalname)]);
+
+  converter.stdout.on('data', function (data) {
+    loger.write(JSON.parse(data).toString() + "\n");
     statusMap['result'] = JSON.parse(data);
   });
 
-  python.stdout.on('message', function (data) {
-    console.log(data.toString());
+  converter.stdout.on('message', function (data) {
+    loger.write(data.toString());
     statusMap['log'] = data.toString();
   });
 
-  python.on('close', (code) => {
-    console.log(`child process close all stdio with code ${code}`);
+  converter.on('close', (code) => {
+    loger.write(`[${new Date()}]: Child process exited with code ${code}` + "\n");
     res.send(statusMap);
   });
 
 })
 
 app.get('/download', (req, res) => {
-  let filePath = path.join('./', req.query.name + '.doc');
-  console.log(filePath);
+  let filePath = path.join('./uploads/', req.query.name + '.doc');
+  loger.write(`[${new Date()}]: Downloading file - ` + req.query.name + ".doc\n");
   res.download(filePath);
 })
 
 app.get('/clean', (req, res) => {
-  let docFilePath = path.join('./', req.query.name + '.doc');
-  let pdfFilePath = path.join('./', req.query.name + '.pdf');
+  let docFilePath = path.join('./uploads/', req.query.name + '.doc');
+  let pdfFilePath = path.join('./uploads/', req.query.name + '.pdf');
 
   try {
     fs.unlinkSync(docFilePath);
     fs.unlinkSync(pdfFilePath);
 
-    console.log("File is deleted.");
-    res.send({status: true});
+    loger.write(`[${new Date()}]: Deleted files - ` + req.query.name + "\n");
+    res.send({ status: true });
   } catch (error) {
-    console.log(error);
-    res.send({status: false});
+    loger.write(`[${new Date()}]: Error deleting files - ` + req.query.name + "\n");
+    res.send({ status: false });
   }
 
 })

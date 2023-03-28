@@ -4,7 +4,6 @@ const fs = require('fs'); // file system module for reading and writing files
 
 const path = require('path'); // path module for file path handling
 const multer = require('multer');  // multer module for handling file uploads
-const { Console } = require('console');
 var upload = multer({ dest: './uploads/' }) // multer current working directory configuration
 
 var app = express();
@@ -13,7 +12,7 @@ const loger = fs.createWriteStream('./log.txt', { flags: 'a' }); // write stream
 
 app.post('/upload', upload.single("pdf"), function (req, res) {
 
-  loger.write(`[${new Date()}]: Received file - ` + req.file.originalname + "\n");
+  loger.write(`[${new Date().toUTCString()}]: Received file - ` + req.file.originalname + "\n");
   var statusMap = {};
 
   var src = fs.createReadStream(req.file.path);
@@ -32,22 +31,20 @@ app.post('/upload', upload.single("pdf"), function (req, res) {
     res.end();
   });
 
-  console.log(process.cwd());
-
   const converter = spawn('python', ['./app.py', path.join(process.cwd() + "\\uploads\\", req.file.originalname)]);
 
   converter.stdout.on('data', function (data) {
-    loger.write(JSON.parse(data).toString() + "\n");
+    loger.write(`[${new Date().toUTCString()}]: Data - ` + JSON.stringify(JSON.parse(data)) + "\n");
     statusMap['result'] = JSON.parse(data);
   });
 
   converter.stdout.on('message', function (data) {
-    loger.write(data.toString());
+    loger.write(`[${new Date().toUTCString()}]: Data - ` + data.toString() + "\n");
     statusMap['log'] = data.toString();
   });
 
   converter.on('close', (code) => {
-    loger.write(`[${new Date()}]: Child process exited with code ${code}` + "\n");
+    loger.write(`[${new Date().toUTCString()}]: Child process exited with code ${code}` + "\n");
     res.send(statusMap);
   });
 
@@ -55,7 +52,7 @@ app.post('/upload', upload.single("pdf"), function (req, res) {
 
 app.get('/download', (req, res) => {
   let filePath = path.join('./uploads/', req.query.name + '.doc');
-  loger.write(`[${new Date()}]: Downloading file - ` + req.query.name + ".doc\n");
+  loger.write(`[${new Date().toUTCString()}]: Downloading file - ` + req.query.name + ".doc\n");
   res.download(filePath);
 })
 
@@ -67,13 +64,13 @@ app.get('/clean', (req, res) => {
     fs.unlinkSync(docFilePath);
     fs.unlinkSync(pdfFilePath);
 
-    loger.write(`[${new Date()}]: Deleted files - ` + req.query.name + "\n");
+    loger.write(`[${new Date().toUTCString()}]: Deleted files - ` + req.query.name + "\n");
     res.send({ status: true });
   } catch (error) {
-    loger.write(`[${new Date()}]: Error deleting files - ` + req.query.name + "\n");
+    loger.write(`[${new Date().toUTCString()}]: Error deleting files - ` + req.query.name + "\n");
     res.send({ status: false });
   }
 
 })
 
-module.exports = app
+module.exports = { app, loger };

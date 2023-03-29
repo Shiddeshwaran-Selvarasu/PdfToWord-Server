@@ -9,12 +9,13 @@ async function upload(file){
 
     src.pipe(dest);
 
-    src.on('end', function () {
+    src.once('end', function () {
+        console.log('File uploaded successfully');
         fs.unlinkSync(file.path);
         eventEmitter.emit('uploaded', true);
     });
 
-    src.on('error', function (err) {
+    src.once('error', function (err) {
         eventEmitter.emit('uploaded', false);
     });
 }

@@ -16,7 +16,7 @@ app.post('/upload', upload.single("pdf"),async function (req, res) {
 
     uploader.upload(req.file);
 
-    uploader.events.on('uploaded', async function (status) {
+    uploader.events.once('uploaded', async function (status) {
         if (status) {
             statusMap['uploaded'] = true;
             runner.convert(req.file);

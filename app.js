@@ -10,13 +10,13 @@ const runner = require('./scriptRunner.js');
 const app = express();
 const upload = multer({ dest: './uploads/' }) // multer current working directory configuration
 
-app.post('/upload', upload.single("pdf"), function (req, res) {
+app.post('/upload', upload.single("pdf"),async function (req, res) {
     log(`Received file - ${req.file.originalname}`);
     var statusMap = {};
 
     uploader.upload(req.file);
 
-    uploader.events.on('uploaded', function (status) {
+    uploader.events.on('uploaded', async function (status) {
         if (status) {
             statusMap['uploaded'] = true;
             runner.convert(req.file);

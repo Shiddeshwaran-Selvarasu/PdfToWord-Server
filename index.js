@@ -16,11 +16,11 @@ process.on('SIGINT', () => {
 });  // CTRL+C
 
 process.on('SIGQUIT', () => {
-  loger.write("Server stopped on quit signal");
+  log("Server stopped on quit signal");
   process.exit();
 }); // Keyboard quit
 
 process.on('SIGTERM', () => {
-  loger.write("Server stopped on terminate signal");
+  log("Server stopped on terminate signal");
   process.exit();
 }); // `kill` command

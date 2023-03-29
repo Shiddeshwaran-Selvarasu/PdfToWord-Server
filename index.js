@@ -1,25 +1,26 @@
-const { app , loger} = require('./file')
+const app = require('./app.js');
+const log = require('./loger.js');
 
 app.listen(4001, () => {
-  loger.write(`[${new Date().toUTCString()}]: Server Running on port 4001.......\n`);
+  log("Server Running on port 4001.......");
   console.log('Server Running on port 4001.......')
 })
 
 process.on('uncaughtException', function (err) {
-  loger.write(`[${new Date().toUTCString()}]: Caught exception: ` + err + "\n");
+  log(`Caught exception: ${err} `);
 });
 
 process.on('SIGINT', () => {
-  loger.write(`[${new Date().toUTCString()}]: Server stopped on interrupt signal ctrl+c \n`);
+  log("Server stopped on interrupt signal ctrl+c");
   process.exit();
 });  // CTRL+C
 
 process.on('SIGQUIT', () => {
-  loger.write(`[${new Date().toUTCString()}]: Server stopped on quit signal` + "\n");
+  loger.write("Server stopped on quit signal");
   process.exit();
 }); // Keyboard quit
 
 process.on('SIGTERM', () => {
-  loger.write(`[${new Date().toUTCString()}]: Server stopped on terminate signal` + "\n");
+  loger.write("Server stopped on terminate signal");
   process.exit();
 }); // `kill` command

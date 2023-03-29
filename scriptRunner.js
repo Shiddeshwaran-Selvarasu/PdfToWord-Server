@@ -8,18 +8,23 @@ const eventEmitter = new event.EventEmitter();
 
 function converter(file) {
     log(`Converting file - ${path.join(process.cwd() + "/uploads/" + file.originalname)}`);
-    childProcess.exec(`sudo python3 ./converter.py ${path.join(process.cwd() + "/uploads/" + file.originalname)}`, (error, stdout, stderr) => {
+    var converter = childProcess.exec(`sudo python3 ./converter.py ${path.join(process.cwd() + "/uploads/" + file.originalname)}`, (error, stdout, stderr) => {
         if (error) {
-            console.error(`error: ${error.message}`);
+            eventEmitter.emit('error', error);
             return;
         }
 
         if (stderr) {
-            console.error(`stderr: ${stderr}`);
+            eventEmitter.emit('stderr', stderr);
             return;
         }
 
-        console.log(`stdout:\n${stdout}`);
+        eventEmitter.emit('stdout', stdout);
+    });
+
+    converter.removeAllListeners('exit');
+    converter.on('exit', (code) => {
+        eventEmitter.emit('closed', code);
     });
 }
 

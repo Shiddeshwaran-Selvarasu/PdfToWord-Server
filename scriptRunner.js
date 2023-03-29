@@ -8,7 +8,7 @@ const eventEmitter = new event.EventEmitter();
 
 async function converter(file) {
     log(`Converting file - ${path.join(process.cwd() + "/uploads", file.originalname)}`);
-    const converter = childProcess.exec(`sudo python3 ./converter.py ${path.join(process.cwd() + "/uploads/" + file.originalname)}`, (err, data)=> {
+    const converter = childProcess.exec(`sudo python3 ./converter.py ${path.join(process.cwd() + "/uploads" + file.originalname)}`, (err, data)=> {
         if(err) console.log("ERR:", err);
         else console.log("Data:", data);
     });

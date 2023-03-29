@@ -21,23 +21,13 @@ app.post('/upload', upload.single("pdf"),async function (req, res) {
             statusMap['uploaded'] = true;
             runner.convert(req.file);
 
-            runner.events.on('stdout', function (status) {
-                log(`Data - ${JSON.stringify(status)}`);
-                statusMap['result'] = status;
-            });
-
-            runner.events.on('error', function (status) {
-                log(`Error - ${status}`);
-                statusMap['Error'] = status;
-            });
-
-            runner.events.on('stderr', function (status) {
-                log(`stderr - ${status}`);
-                statusMap['stderr'] = status;
-            });
-
             runner.events.on('closed', function (status) {
                 log(`Child process exited with code ${status}`);
+                if(status == 1){
+                    statusMap['converted'] = false;
+                } else {
+                    statusMap['converted'] = true;
+                }
                 res.send(statusMap);
             });
         } else {

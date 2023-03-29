@@ -6,9 +6,9 @@ const log = require('./loger.js');
 
 const eventEmitter = new event.EventEmitter();
 
-async function converter(file) {
+function converter(file) {
     log(`Converting file - ${path.join(process.cwd() + "/uploads/" + file.originalname)}`);
-    const converter = childProcess.exec(`sudo python3 ./converter.py ${path.join(process.cwd() + "/uploads/" + file.originalname)}`, (error, stdout, stderr) => {
+    childProcess.exec(`sudo python3 ./converter.py ${path.join(process.cwd() + "/uploads/" + file.originalname)}`, (error, stdout, stderr) => {
         if (error) {
             console.error(`error: ${error.message}`);
             return;

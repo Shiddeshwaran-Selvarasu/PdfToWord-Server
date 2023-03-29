@@ -21,7 +21,7 @@ app.post('/upload', upload.single("pdf"),async function (req, res) {
             statusMap['uploaded'] = true;
             runner.convert(req.file);
 
-            runner.events.on('closed', function (status) {
+            runner.events.once('closed', function (status) {
                 log(`Child process exited with code ${status}`);
                 if(status == 1){
                     statusMap['converted'] = false;

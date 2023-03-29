@@ -27,6 +27,7 @@ app.post('/upload', upload.single("pdf"), function (req, res) {
             });
 
             runner.events.on('log', function (status) {
+                log(`Log - ${status}`);
                 statusMap['log'] = status;
             });
 

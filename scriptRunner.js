@@ -7,7 +7,7 @@ const log = require('./loger.js');
 const eventEmitter = new event.EventEmitter();
 
 async function converter(file) {
-    log(`Converting file - ${path.join(process.cwd() + "\\uploads\\", file.originalname)}`);
+    log(`Converting file - ${path.join(process.cwd() + "/uploads", file.originalname)}`);
     const converter = spawn('sudo python3', ['./converter.py', path.join(process.cwd() + "/uploads", file.originalname)]);
     converter.stdout.on('data', function (data) {
         eventEmitter.emit('converted', JSON.parse(data));

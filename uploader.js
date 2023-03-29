@@ -10,7 +10,6 @@ async function upload(file){
     src.pipe(dest);
 
     src.once('end', function () {
-        console.log('File uploaded successfully');
         fs.unlinkSync(file.path);
         eventEmitter.emit('uploaded', true);
     });

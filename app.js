@@ -4,8 +4,6 @@ const multer = require('multer');  // multer module for handling file uploads
 const fs = require('fs'); // file system module for file handling
 
 const log = require('./loger.js');
-const uploader = require('./uploader.js');
-const runner = require('./scriptRunner.js');
 
 const app = express();
 const upload = multer({ dest: './uploads/' }) // multer current working directory configuration
@@ -13,6 +11,9 @@ const upload = multer({ dest: './uploads/' }) // multer current working director
 app.post('/upload', upload.single("pdf"),async function (req, res) {
     log(`Received file - ${req.file.originalname}`);
     var statusMap = {};
+
+    const uploader = require('./uploader.js');
+    const runner = require('./scriptRunner.js');
 
     uploader.upload(req.file);
 

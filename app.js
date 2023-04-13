@@ -21,7 +21,7 @@ app.post("/upload", upload.single("pdf"), async function (req, res) {
   src.pipe(dest);
 
   src.once("end", function () {
-    fs.unlinkSync(file.path);
+    fs.unlinkSync(req.file.path);
     log(
       `Converting file - ${path.join(
         process.cwd() + "/uploads/" + req.file.originalname

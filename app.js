@@ -15,7 +15,7 @@ app.post("/upload", upload.single("pdf"), async function (req, res) {
 
   const src = fs.createReadStream(req.file.path);
   var dest = fs.createWriteStream(
-    path.join(process.cwd(), "uploads", req.file.originalname)
+    path.join(process.cwd() + "/uploads/" + req.file.originalname)
   );
 
   src.pipe(dest);

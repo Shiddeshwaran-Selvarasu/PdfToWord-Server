@@ -24,12 +24,12 @@ app.post("/upload", upload.single("pdf"), async function (req, res) {
     fs.unlinkSync(file.path);
     log(
       `Converting file - ${path.join(
-        process.cwd() + "/uploads/" + file.originalname
+        process.cwd() + "/uploads/" + req.file.originalname
       )}`
     );
     var converter = childProcess.exec(
       `sudo python3 ./converter.py ${path.join(
-        process.cwd() + "/uploads/" + file.originalname
+        process.cwd() + "/uploads/" + req.file.originalname
       )}`
     );
     converter.on("exit", (status) => {

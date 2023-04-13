@@ -13,8 +13,6 @@ app.post("/upload", upload.single("pdf"), async function (req, res) {
   log(`Received file - ${req.file.originalname}`);
   var statusMap = {};
 
-  const uploader = require("./uploader.js");
-
   const src = fs.createReadStream(req.file.path);
   var dest = fs.createWriteStream(
     path.join(process.cwd(), "uploads", req.file.originalname)
